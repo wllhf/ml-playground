@@ -1,24 +1,26 @@
 import numpy as np
-"""
 
-"""
-
-
-def linear(w, X, b=0):
-    return w.dot(X) + b
+import utils
 
 
 class BinaryTree():
     """ Array based binary tree. """
 
-    def __init__(self, node_dim, depth):
+    def __init__(self, node_dim, leaf_dim, depth):
         self.depth = depth
-        self.tree = np.array((node_dim, 2**self.depth-1))
+        self.nodes = np.array((node_dim, 2**self.depth-1))
+        self.leaves = np.array((leaf_dim, 2**self.depth))
 
-    def _l_child_ind(ind):
+    def l_child_idx(idx):
         pass
 
-    def _r_child_ind(ind):
+    def r_child_idx(idx):
+        pass
+
+    def _depth(self, idx):
+        pass
+
+    def get_node(ind):
         pass
 
     def is_leaf(ind):
@@ -28,19 +30,23 @@ class BinaryTree():
 class DecisionTree(BinaryTree):
     """ """
 
-    def __init__(self, dim_in, node_func=None, max_depth=2):
-        self.node_func = node_func
+    def __init__(self, max_depth=2, min_samples=1):
         self.max_depth = max_depth
-        self.tree = np.array((dim_in, 2**self.max_depth-1))
-        self.result = np.zeros((2*max_depth))
+        self.min_samples = min_samples
+        self.split_fi = np.empty(2**self.max_depth-1, dtype=np.uint8)
+        self.split_th = np.empty(2**self.max_depth-1, dtype=np.float32)
+        self.leaves = None
 
-    def _split(self, X, Y):
-        
-        self._split()
-        self._split()
-        
-    def fit(self, X, Y):
-        pass
+    def fit(self, X, Y, idx=0):
+        if len(Y) > self.min_samples and self._depth(idx) <= self.max_depth:
+            fi, th, Xl, Yl, Xr, Yr = utils.best_split(X, Y)
+            self.split_fi[idx] = fi
+            self.split_th[idx] = th
+            self.fit(Xl, Yl, self._l_child(idx))
+            self.fit(Xr, Yr, self._r_child(idx))
+        else:
+            # create leaf
+            pass
 
     def _decide(self, node, X):
         l_child = self._l_child_ind(node)
@@ -57,3 +63,4 @@ class DecisionTree(BinaryTree):
     def predict(self, X):
         self._decide(0, X)
         return self.result
+
