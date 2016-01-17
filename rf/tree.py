@@ -3,64 +3,84 @@ import numpy as np
 import utils
 
 
-class BinaryTree():
-    """ Array based binary tree. """
+# worker functions for multiprocessing ########################################
+def fit_worker(args):
+    args[0].fit(args[1], args[2])
+    return args[0]
 
-    def __init__(self, node_dim, leaf_dim, depth):
+
+def predict_worker(args):
+    return args[0].predict(args[1])
+###############################################################################
+
+
+class Node():
+    def __init__(self, depth):
+        self.is_leaf = False
         self.depth = depth
-        self.nodes = np.array((node_dim, 2**self.depth-1))
-        self.leaves = np.array((leaf_dim, 2**self.depth))
+        self.fi = None
+        self.th = None
+        self.l_child = None
+        self.r_child = None
 
-    def l_child_idx(idx):
-        pass
+    def append_l(self):
+        self.l_child = Node(self.depth+1)
+        return self.l_child
 
-    def r_child_idx(idx):
-        pass
-
-    def _depth(self, idx):
-        pass
-
-    def get_node(ind):
-        pass
-
-    def is_leaf(ind):
-        pass
+    def append_r(self):
+        self.r_child = Node(self.depth+1)
+        return self.r_child
 
 
-class DecisionTree(BinaryTree):
+class Leaf():
+    def __init__(self, Y, n_classes):
+        self.is_leaf = True
+        self.distribution = np.bincount(Y[:, 0], minlength=n_classes)/float(Y.shape[0])
+        self.class_max = np.argmax(self.distribution)
+
+
+class ClassificationTree():
     """ """
 
-    def __init__(self, max_depth=2, min_samples=1):
+    def __init__(self, n_classes, max_depth=2, min_samples=1, randomness=0):
+        self.n_classes = n_classes
         self.max_depth = max_depth
         self.min_samples = min_samples
-        self.split_fi = np.empty(2**self.max_depth-1, dtype=np.uint8)
-        self.split_th = np.empty(2**self.max_depth-1, dtype=np.float32)
-        self.leaves = None
+        self.r = randomness
+        self.n_feature_dims = None
+        self.root = Node(0)
 
-    def fit(self, X, Y, idx=0):
-        if len(Y) > self.min_samples and self._depth(idx) <= self.max_depth:
-            fi, th, Xl, Yl, Xr, Yr = utils.best_split(X, Y)
-            self.split_fi[idx] = fi
-            self.split_th[idx] = th
-            self.fit(Xl, Yl, self._l_child(idx))
-            self.fit(Xr, Yr, self._r_child(idx))
+    def _fit(self, X, Y, node):
+        indices = np.random.permutation(X.shape[1])[:self.n_feature_dims]
+        (fi, th), (Xl, Yl), (Xr, Yr) = utils.best_split(X, Y, indices=indices)
+        node.fi = fi
+        node.th = th
+        # plot_split(X, Y, (fi, th))
+
+        if Yl.shape[0] > self.min_samples and np.unique(Yl).shape[0] > 1 and node.depth < self.max_depth:
+            self._fit(Xl, Yl, node.append_l())
         else:
-            # create leaf
-            pass
+            node.l_child = Leaf(Yl, self.n_classes)
 
-    def _decide(self, node, X):
-        l_child = self._l_child_ind(node)
-        r_child = self._r_child_ind(node)
-        indices = (self.result == node)
+        if Yr.shape[0] > self.min_samples and np.unique(Yr).shape[0] > 1 and node.depth < self.max_depth:
+            self._fit(Xr, Yr, node.append_r())
+        else:
+            node.r_child = Leaf(Yr, self.n_classes)
 
-        l, r = self.node_func(self.tree[node], X[indices])
-        self.result[indices][l] = l_child
-        self.result[indices][r] = r_child
+    def fit(self, X, Y):
+        self.n_feature_dims = max(np.rint(X.shape[1]*(1-self.r)), 1)
+        self._fit(X, Y, self.root)
 
-        self._decide(l_child, X)
-        self._decide(r_child, X)
+    def _decide(self, node, X, indices, result):
+        if node.is_leaf:
+            result[indices] = node.distribution
+        else:
+            indices_l = X[:, node.fi] < node.th
+            indices_r = X[:, node.fi] >= node.th
+            self._decide(node.l_child, X, indices_l, result)
+            self._decide(node.r_child, X, indices_r, result)
 
     def predict(self, X):
-        self._decide(0, X)
-        return self.result
-
+        result = np.zeros((X.shape[0], self.n_classes))
+        self._decide(self.root, X, indices=np.ones(X.shape[0]), result=result)
+        return result
