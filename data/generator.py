@@ -5,10 +5,10 @@ import numpy as np
 class Generator():
     """ """
 
-    def __init__(self, n_features, n_classes):
+    def __init__(self, n_features, n_classes, density=2.0):
         self.d = n_features
         self.C = range(n_classes)
-        self.density = 5
+        self.density = density
         self.X = None
         self.Y = None
 
