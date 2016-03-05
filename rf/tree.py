@@ -55,7 +55,6 @@ class ClassificationTree():
         (fi, th), (Xl, Yl), (Xr, Yr) = utils.best_split(X, Y, indices=indices)
         node.fi = fi
         node.th = th
-        # plot_split(X, Y, (fi, th))
 
         if Yl.shape[0] > self.min_samples and np.unique(Yl).shape[0] > 1 and node.depth < self.max_depth:
             self._fit(Xl, Yl, node.append_l())
