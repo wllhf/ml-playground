@@ -15,6 +15,7 @@ class Generator():
     def gauss(self, a=-5, b=5, sigma=1):
         mu = (b-a)*np.random.random(self.d) + a
         cov = np.random.random((self.d, self.d))*sigma
+        cov = np.dot(cov, cov.T)
         return mu, cov
 
     def generate(self, n_samples):

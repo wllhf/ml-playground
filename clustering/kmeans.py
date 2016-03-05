@@ -1,6 +1,6 @@
 import numpy as np
 
-import matplotlib.pyplot as plt
+from util.plot import clear_draw_and_wait
 
 
 class kMeans(object):
@@ -34,26 +34,17 @@ class kMeans(object):
         n = data.shape[0]
         self.means = data[np.random.choice(n, k, replace=False)]
 
-        if visualize:
-            plt.ion()
-            plt.figure()
-
         delta = epsilon
         while(delta >= epsilon):
 
             labels = self._min_dist_means(data)
-            new_means = self._new_means(data, labels, k)
-            delta = np.sum(np.abs(new_means - self.means))
-            self.means = new_means
 
             if visualize:
-                plt.clf()
-                plt.scatter(data[:, 0], data[:, 1], c=labels, s=50)
-                plt.scatter(self.means[:, 0], self.means[:, 1], c='b', s=100)
-                plt.draw()
-                plt.waitforbuttonpress()
+                clear_draw_and_wait(data, labels, self.means)
 
-        plt.close()
+            new_means = self._new_means(data, labels, k)
+            delta = np.sum(np.linalg.norm(new_means - self.means, axis=1))
+            self.means = new_means
 
         return labels
 
