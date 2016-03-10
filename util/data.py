@@ -7,7 +7,7 @@ N_CLASSES = 3
 N_SAMPLES = 1000
 
 g = Generator(2, N_CLASSES)
-g.generate(N_SAMPLES)
+g.generate_gaussian(N_SAMPLES)
 g.save('data_c_3_n_1000')
 
 fig = plt.figure()

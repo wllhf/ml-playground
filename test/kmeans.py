@@ -8,7 +8,7 @@ N_SAMPLES = 1000
 N_DIMS = 2
 
 g = Generator(N_DIMS, N_CLASSES, 50.0)
-g.generate(N_SAMPLES)
+g.generate_gaussian(N_SAMPLES)
 
 classifier = kMeans()
 

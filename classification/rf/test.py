@@ -13,7 +13,7 @@ N_CLASSES = 3
 N_SAMPLES = 1000
 
 # g = Generator(N_DIMS, N_CLASSES)
-# g.generate(N_SAMPLES)
+# g.generate_gaussian(N_SAMPLES)
 with open(b'data_c_3_n_1000', 'rb') as inp:
     g = pickle.load(inp)
 g.shuffle()

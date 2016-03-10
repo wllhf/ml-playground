@@ -12,7 +12,7 @@ N_SAMPLES = 1000
 N_DIMS = 2
 
 g = Generator(N_DIMS, N_CLASSES)
-g.generate(N_SAMPLES)
+g.generate_gaussian(N_SAMPLES)
 data = g.X
 
 transformation = PCA()
