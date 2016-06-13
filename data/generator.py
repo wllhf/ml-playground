@@ -12,18 +12,18 @@ class Generator():
         self.X = None
         self.Y = None
 
-    def gauss(self, a=-5, b=5, sigma=1):
-        mu = (b-a)*np.random.random(self.d) + a
-        cov = np.random.random((self.d, self.d))*sigma
+    def gauss(self, a=-5, b=5, centered=False):
+        mu = np.zeros(self.d) if centered else (b-a)*np.random.random(self.d) + a
+        cov = np.random.random((self.d, self.d))
         cov = np.dot(cov, cov.T)
         return mu, cov
 
-    def generate_gaussian(self, n_samples):
-        a = np.sqrt(float(n_samples*len(self.C))/self.density)/2.0
-        dists = [self.gauss(-a, a) for c in self.C]
-        samples = [np.random.multivariate_normal(d[0], d[1], n_samples) for d in dists]
+    def generate_gaussian(self, n_samples_class, centered=False):
+        a = np.sqrt(float(n_samples_class*len(self.C))/self.density)/2.0
+        dists = [self.gauss(-a, a, centered) for c in self.C]
+        samples = [np.random.multivariate_normal(d[0], d[1], n_samples_class) for d in dists]
         self.X = np.vstack(samples)
-        self.Y = np.vstack([np.ones((n_samples, 1), dtype=np.uint8)*c for c in self.C])
+        self.Y = np.vstack([np.ones((n_samples_class, 1), dtype=np.uint8)*c for c in self.C])
         return dists
 
     def shuffle(self):

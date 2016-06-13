@@ -1,15 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
-from data.generator import Generator
 
-N_CLASSES = 3
-N_SAMPLES = 1000
-
-g = Generator(2, N_CLASSES)
-g.generate_gaussian(N_SAMPLES)
-g.save('data_c_3_n_1000')
-
-fig = plt.figure()
-plt.scatter(g.X[:, 0], g.X[:, 1], c=g.Y, s=50)
-plt.show()
+def whiten(X, fudge=1E-18):
+    """ """
+    d, V = np.linalg.eigh(np.dot(X.T, X))
+    D = np.diag(1. / np.sqrt(d+fudge))
+    W = np.dot(np.dot(V, D), V.T)
+    X_white = np.dot(X, W)
+    return X_white, W

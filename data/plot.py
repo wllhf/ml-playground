@@ -4,6 +4,10 @@ matplotlib.use('GTK3Agg')
 import matplotlib.pyplot as plt
 
 
+def scatter_data(data, labels):
+    plt.scatter(data[:, 0], data[:, 1], c=labels, s=50)
+
+
 def clear_draw_and_wait(data, labels, marker=None):
     plt.clf()
     plt.scatter(data[:, 0], data[:, 1], c=labels, s=50)
