@@ -1,4 +1,4 @@
-from util.generator import Generator
+from data.generator import Generator
 from clustering.kmeans import kMeans
 
 import matplotlib.pyplot as plt

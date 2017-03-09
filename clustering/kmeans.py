@@ -1,6 +1,6 @@
 import numpy as np
 
-from util.plot import clear_draw_and_wait
+from data.plot import clear_draw_and_wait
 
 
 class kMeans(object):
