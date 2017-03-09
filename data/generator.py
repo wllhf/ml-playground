@@ -35,3 +35,42 @@ class Generator():
     def save(self, filename):
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+
+
+class ClassificationData():
+
+    def __init__(self, n_dims, n_classes, density=2.0):
+        self.d = n_dims
+        self.C = range(n_classes)
+        self.density = density
+        self.X = None
+        self.Y = None
+
+    def gauss(self, a=-5, b=5, centered=False):
+        mu = np.zeros(self.d) if centered else (b-a)*np.random.random(self.d) + a
+        cov = np.random.random((self.d, self.d))
+        cov = np.dot(cov, cov.T)
+        return mu, cov
+
+    def generate_gaussian(self, n_samples_class, centered=False):
+        a = np.sqrt(float(n_samples_class*len(self.C))/self.density)/2.0
+        dists = [self.gauss(-a, a, centered) for c in self.C]
+        samples = [np.random.multivariate_normal(d[0], d[1], n_samples_class) for d in dists]
+        self.X = np.vstack(samples)
+        self.Y = np.vstack([np.ones((n_samples_class, 1), dtype=np.uint8)*c for c in self.C])
+        return dists
+
+
+class RegressionData():
+
+    def __init__(self, func, sigma=1, values=100):
+        self.func = func
+        self.sigma = sigma
+        self.values = values
+        self.X = None
+        self.Y = None
+
+    def generate(self):
+        self.X = np.arange(-self.values/2, self.values/2)
+        self.Y = self.func(self.X) + np.random.normal(0, self.sigma, self.X.shape[0])
+        return self.X, self.Y
