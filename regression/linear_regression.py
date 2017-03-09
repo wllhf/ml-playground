@@ -7,16 +7,26 @@ class LinRegression(object):
         self.alpha = None
         self.beta = None
 
-    def fit_ols(self, Y, X):
+    def fit(self, Y, X):
+        """ Ordinary least squares regression.
+
+        Parameters:
+        -----------
+        X: numpy array (nxd)
+        Y: numpy array (n)
+        """
         X = X if len(X.shape) > 1 else np.expand_dims(X, axis=1)
         Y = Y if len(Y.shape) > 1 else np.expand_dims(Y, axis=1)
+
+        # center data
         Yc = Y - Y.mean()
         Xc = X - X.mean()
-        self.beta = np.squeeze(np.linalg.inv((Xc.T).dot(Xc)).dot(Xc.T).dot(Yc))
-        self.alpha = (Y - self.beta.dot(X)).sum()/float(X.shape[0])
 
-    def fit_ml(self):
-        pass
+        # beta = (XcT*Xc)^-1 *XcT*Yc
+        self.beta = np.linalg.inv((Xc.T).dot(Xc)).dot(Xc.T).dot(Yc)
+        self.alpha = np.sum(Y - X.dot(self.beta), axis=1)/float(X.shape[0])
+        print self.beta.shape, self.alpha.shape
 
     def predict(self, X):
-        return self.beta.dot(X) + self.alpha
+        X = X if len(X.shape) > 1 else np.expand_dims(X, axis=1)
+        return X.dot(self.beta) + self.alpha
