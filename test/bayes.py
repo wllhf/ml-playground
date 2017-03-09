@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats
 from classification.bayes import NaiveBayes
-from util.generator import Generator
+from data.generator import Generator
 
 import matplotlib.pyplot as plt
 
