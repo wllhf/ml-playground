@@ -25,7 +25,6 @@ class LinRegression(object):
         # beta = (XcT*Xc)^-1 *XcT*Yc
         self.beta = np.linalg.inv((Xc.T).dot(Xc)).dot(Xc.T).dot(Yc)
         self.alpha = np.sum(Y - X.dot(self.beta), axis=1)/float(X.shape[0])
-        print self.beta.shape, self.alpha.shape
 
     def predict(self, X):
         X = X if len(X.shape) > 1 else np.expand_dims(X, axis=1)
